@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Rain to Groundwater: Understanding Our Underground Water</title>
+<meta name="description" content="An interactive explanation of how rainwater becomes groundwater and returns to the surface.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
+
+<!-- ==================== 2. CSS ==================== -->
+<style>
+/* ---- Theme tokens ---- */
+:root{--bg:#eef4f3;--card:#fff;--ink:#10303a;--mute:#4b6770;--acc:#1a6fa8;--on-acc:#fff;--acc2:#0b7d6e;--line:#d3e1e0;--soft:#e2eeee;--warn:#b3261e;--ok:#12794a;--shadow:0 6px 22px rgba(16,48,58,.09);--r:18px}
+[data-theme="dark"]{--bg:#0b1a21;--card:#122832;--ink:#e4f0f2;--mute:#9bb6bd;--acc:#5bb6ee;--on-acc:#06202e;--acc2:#4fd1b9;--line:#23404b;--soft:#183540;--warn:#ff8a80;--ok:#6fdca4;--shadow:0 6px 22px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;transition:background .4s,color .4s}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style",serif;line-height:1.2;margin:0 0 .5em}
+h2{font-size:clamp(1.6rem,4vw,2.3rem)}
+p{margin:0 0 1em}
+section{padding:72px 0;scroll-margin-top:56px}
+.wrap{width:min(1100px,92%);margin:auto}
+.lead{color:var(--mute);max-width:62ch}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px;border-radius:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);transition:background .4s,border-color .4s,transform .25s}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.btn{font:inherit;font-weight:600;border:0;cursor:pointer;background:var(--acc);color:var(--on-acc);padding:12px 22px;border-radius:999px;transition:transform .2s,box-shadow .2s,opacity .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(26,111,168,.35)}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.55;cursor:default;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--acc);border:2px solid var(--acc)}
+
+/* ---- Navigation ---- */
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav{display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:Georgia,serif;font-weight:700;text-decoration:none;color:var(--ink)}
+.links{display:flex;gap:4px;align-items:center}
+.links a{color:var(--ink);text-decoration:none;padding:7px 12px;border-radius:999px;font-size:.95rem;transition:background .2s}
+.links a:hover{background:var(--soft)}
+.icon-btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;cursor:pointer;transition:transform .2s}
+.icon-btn:hover{transform:scale(1.06)}
+#menuBtn{display:none}
+#progress{position:absolute;left:0;bottom:-1px;height:3px;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+@media(max-width:760px){
+ #menuBtn{display:inline-block}
+ .links{position:absolute;top:56px;left:0;right:0;flex-direction:column;align-items:stretch;background:var(--card);padding:10px 4%;border-bottom:1px solid var(--line);display:none}
+ .links.open{display:flex;animation:drop .25s}
+ .links a{padding:12px}
+}
+@keyframes drop{from{opacity:0;transform:translateY(-8px)}}
+
+/* ---- Hero ---- */
+#home{padding-top:56px;background:linear-gradient(180deg,var(--soft),var(--bg))}
+.hero-title{font-size:clamp(2.4rem,8vw,4.6rem);letter-spacing:-.02em}
+.hero-sub{font-size:clamp(1.1rem,2.5vw,1.4rem);color:var(--acc2);font-weight:600}
+.flow{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;margin:34px 0 14px}
+.node{font:inherit;cursor:pointer;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:22px;padding:14px 16px;min-width:108px;text-align:center;transition:transform .25s,border-color .25s,box-shadow .25s}
+.node span{display:block;font-size:2rem;animation:bob 3s ease-in-out infinite}
+.node:nth-child(3) span{animation-delay:.4s}.node:nth-child(5) span{animation-delay:.8s}.node:nth-child(7) span{animation-delay:1.2s}.node:nth-child(9) span{animation-delay:1.6s}
+.node:hover,.node.on{transform:translateY(-5px);border-color:var(--acc);box-shadow:var(--shadow)}
+.arrow{color:var(--acc);font-size:1.4rem;animation:nudge 1.6s infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+@keyframes nudge{50%{transform:translateX(5px)}}
+#heroCap{text-align:center;min-height:3.2em;color:var(--mute)}
+@media(max-width:600px){.arrow{transform:rotate(90deg);width:100%;text-align:center;animation:none}}
+
+/* ---- Simulator ---- */
+.sim{display:grid;gap:20px;grid-template-columns:1fr}
+.scene{border-radius:var(--r);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#9fd3f0}
+.scene svg{display:block;width:100%;height:auto}
+.layer,.hot{cursor:pointer}
+.layer:hover rect,.layer.sel rect{filter:brightness(1.12)}
+.layer.sel>rect:first-child{stroke:#fff;stroke-width:3}
+.hot:hover{filter:brightness(1.2)}
+.cloud{animation:drift 14s ease-in-out infinite alternate}
+.cloud:nth-of-type(2){animation-duration:19s}
+@keyframes drift{to{transform:translateX(40px)}}
+.flowline{fill:none;stroke:#5fc3ff;stroke-width:5;stroke-dasharray:8 8;stroke-linecap:round;animation:dash 1s linear infinite;transition:opacity .6s}
+@keyframes dash{to{stroke-dashoffset:-16}}
+.panels{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+label.ctl{display:block;font-weight:600;margin-bottom:4px}
+input[type=range]{width:100%;accent-color:var(--acc);height:28px}
+.ends{display:flex;justify-content:space-between;font-size:.85rem;color:var(--mute)}
+.val{float:right;color:var(--acc)}
+.stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+.bar{height:12px;border-radius:9px;background:var(--soft);overflow:hidden;margin:8px 0 12px}
+.bar i{display:block;height:100%;width:60%;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:background .4s}
+.pill{font-weight:700;padding:2px 12px;border-radius:99px;background:var(--soft)}
+.warn{display:none;margin-top:12px;padding:10px 14px;border-radius:12px;border:2px solid var(--warn);color:var(--warn);font-weight:600;animation:pulse 1.2s infinite}
+.warn.show{display:block}
+@keyframes pulse{50%{box-shadow:0 0 0 6px transparent;opacity:.75}}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+#info h3{margin-bottom:.3em}
+#info dt{font-weight:700;color:var(--acc2);margin-top:.5em}
+#info dd{margin:0}
+#info.flash{animation:flash .5s}
+@keyframes flash{from{transform:scale(.97);opacity:.4}}
+#dropPanel{display:none}
+#dropPanel.show{display:block}
+.steps{display:flex;gap:6px;margin-top:10px}
+.steps b{flex:1;height:8px;border-radius:5px;background:var(--soft);transition:background .3s}
+.steps b.done{background:var(--acc)}
+
+/* ---- Cycle + cards ---- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:20px 0}
+.chip{font:inherit;cursor:pointer;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:9px 16px;transition:all .25s}
+.chip:hover{border-color:var(--acc)}
+.chip.on{background:var(--acc);color:var(--on-acc);border-color:var(--acc);transform:scale(1.06)}
+.ex{font-size:2rem}
+.card:hover{transform:translateY(-4px)}
+.ex-grid{margin-top:34px}
+
+/* ---- Problem ---- */
+.cmp{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.tank{position:relative;height:200px;border-radius:14px;background:linear-gradient(#b99d6b,#8d7448);overflow:hidden;margin:12px 0;border:1px solid var(--line)}
+.tank .fill{position:absolute;left:0;right:0;bottom:0;height:85%;background:rgba(40,130,210,.75);transition:height .15s linear}
+.tank .fill:before{content:"";position:absolute;left:0;right:0;top:-3px;border-top:3px dashed #fff}
+.tank .tag{position:absolute;left:8px;top:6px;font-size:.8rem;color:#fff;background:rgba(0,0,0,.45);padding:2px 8px;border-radius:8px}
+ul.tight{padding-left:1.2em;margin:.5em 0}
+.bad h3{color:var(--warn)}.good h3{color:var(--ok)}
+
+/* ---- Solutions ---- */
+.sol{text-align:left;font:inherit;color:var(--ink);cursor:pointer}
+.sol h3{font-size:1.1rem;margin:0;display:flex;justify-content:space-between;gap:8px}
+.sol .more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}
+.sol .more>div{overflow:hidden;color:var(--mute)}
+.sol[aria-expanded=true] .more{grid-template-rows:1fr}
+.sol[aria-expanded=true] .more>div{padding-top:10px}
+.sol[aria-expanded=true] h3 b{transform:rotate(45deg)}
+.sol h3 b{transition:transform .25s;color:var(--acc)}
+
+/* ---- Quiz ---- */
+.q{margin-bottom:22px}
+.q legend{font-weight:700;padding:0}
+.opt{display:block;margin:6px 0;padding:10px 14px;border:2px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .2s,background .2s}
+.opt:hover{border-color:var(--acc)}
+.opt:has(input:checked){border-color:var(--acc);background:var(--soft)}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.opt.wrong{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.expl{display:none;font-size:.92rem;color:var(--mute);margin-top:6px}
+.checked .expl{display:block}
+#result{display:none;text-align:center;font-size:1.3rem;font-weight:700;padding:16px;border-radius:14px;background:var(--soft);animation:pop .5s}
+@keyframes pop{from{transform:scale(.8);opacity:0}}
+
+/* ---- Facts / footer ---- */
+.fact{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.fact.in{opacity:1;transform:none}
+.fact .ex{display:block}
+footer{padding:30px 0;text-align:center;color:var(--mute);border-top:1px solid var(--line)}
+
+@media(min-width:900px){.sim{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ==================== 1. HTML STRUCTURE ==================== -->
+
+<!-- Navigation -->
+<header>
+ <div class="wrap"><nav aria-label="Main navigation">
+  <a class="logo" href="#home">💧 Rain to Groundwater</a>
+  <div class="links" id="links">
+   <a href="#home">Home</a><a href="#simulator">Simulator</a><a href="#cycle">Water Cycle</a>
+   <a href="#problems">Problems</a><a href="#solutions">Solutions</a><a href="#quiz">Quiz</a>
+  </div>
+  <div>
+   <button class="icon-btn" id="themeBtn" aria-label="Switch to dark mode">🌙 Dark</button>
+   <button class="icon-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="links">☰</button>
+  </div>
+ </nav></div>
+ <div id="progress" aria-hidden="true"></div>
+</header>
+
+<main>
+<!-- Hero -->
+<section id="home" aria-labelledby="heroH">
+ <div class="wrap" style="text-align:center">
+  <h1 class="hero-title" id="heroH">From Rain to Groundwater</h1>
+  <p class="hero-sub">Discover how water travels beneath our feet and returns to the surface.</p>
+  <p class="lead" style="margin-inline:auto">Groundwater forms when rainwater soaks into the soil, trickles down through gaps between soil, sand and rock, and fills the underground layers called aquifers. From there it slowly moves until it reaches a well, a spring or a river.</p>
+  <div class="flow" role="group" aria-label="Water journey steps; select one to read about it">
+   <button class="node" data-cap="Clouds hold water vapour that condenses into droplets."><span>☁️</span>Clouds</button><i class="arrow">➜</i>
+   <button class="node" data-cap="Rain delivers fresh water to the ground surface."><span>🌧️</span>Rain</button><i class="arrow">➜</i>
+   <button class="node" data-cap="Water soaks into the soil through tiny gaps, called infiltration."><span>🌱</span>Soil</button><i class="arrow">➜</i>
+   <button class="node" data-cap="Water fills pores and cracks in rock and sand: this is groundwater."><span>💧</span>Groundwater</button><i class="arrow">➜</i>
+   <button class="node" data-cap="Groundwater returns to the surface through wells, springs and river beds."><span>⛲</span>Well · Spring · River</button>
+  </div>
+  <p id="heroCap" aria-live="polite">Select a step above to learn more.</p>
+  <a class="btn" href="#simulator" style="text-decoration:none;display:inline-block">Explore the Water Journey</a>
+ </div>
+</section>
+
+<!-- Groundwater Simulator -->
+<section id="simulator" aria-labelledby="simH">
+ <div class="wrap">
+  <h2 id="simH">Groundwater Simulator</h2>
+  <p class="lead">Change the rainfall and water usage, then watch the water table respond. Click the well, the spring or any ground layer to learn more.</p>
+  <div class="sim">
+   <div class="scene">
+    <svg viewBox="0 0 800 470" role="img" aria-label="Cross-section of the ground showing sky, rain, soil layers, an aquifer with a water table, a well, a spring and a river">
+     <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fb7e6"/><stop offset="1" stop-color="#cfeaf8"/></linearGradient>
+      <linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b9ae0" stop-opacity=".8"/><stop offset="1" stop-color="#1f5fb0" stop-opacity=".9"/></linearGradient>
+      <pattern id="pores" width="22" height="18" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="2.5" fill="#6f5a35"/><circle cx="15" cy="13" r="2" fill="#6f5a35"/></pattern>
+     </defs>
+     <rect width="800" height="170" fill="url(#sky)"/>
+     <g fill="#fff" opacity=".95">
+      <g class="cloud"><ellipse cx="140" cy="55" rx="55" ry="22"/><ellipse cx="180" cy="45" rx="40" ry="24"/><ellipse cx="105" cy="48" rx="32" ry="18"/></g>
+      <g class="cloud"><ellipse cx="460" cy="50" rx="60" ry="24"/><ellipse cx="500" cy="40" rx="40" ry="24"/><ellipse cx="420" cy="46" rx="32" ry="18"/></g>
+      <g class="cloud"><ellipse cx="660" cy="62" rx="50" ry="20"/><ellipse cx="690" cy="52" rx="34" ry="20"/></g>
+     </g>
+     <!-- Underground layers (clickable) -->
+     <g class="layer" data-info="topsoil" tabindex="0" role="button" aria-label="Topsoil layer: show information"><rect y="170" width="800" height="60" fill="#7a5231"/></g>
+     <g class="layer" data-info="sand" tabindex="0" role="button" aria-label="Sand and gravel layer: show information"><rect y="230" width="800" height="70" fill="#d2b46f"/></g>
+     <g class="layer" data-info="aquifer" tabindex="0" role="button" aria-label="Aquifer layer: show information"><rect y="300" width="800" height="100" fill="#b99d6b"/><rect y="300" width="800" height="100" fill="url(#pores)" pointer-events="none"/></g>
+     <g class="layer" data-info="rock" tabindex="0" role="button" aria-label="Impermeable rock layer: show information"><rect y="400" width="800" height="70" fill="#5f646e"/></g>
+     <!-- hill, river -->
+     <path d="M0 170 L0 125 Q170 108 300 170 Z" fill="#7a5231" pointer-events="none"/>
+     <path d="M0 125 Q170 108 300 170" fill="none" stroke="#4f9d3a" stroke-width="8" pointer-events="none"/>
+     <rect y="166" x="300" width="360" height="6" fill="#4f9d3a" pointer-events="none"/>
+     <path d="M650 166 L800 166 L800 205 Q720 205 680 180 Z" fill="#3a8fd0" pointer-events="none"/>
+     <text x="715" y="190" fill="#fff" font-size="14" font-weight="700" pointer-events="none">River</text>
+     <!-- groundwater body -->
+     <rect id="gwRect" x="0" y="240" width="800" height="160" fill="url(#gw)" pointer-events="none"/>
+     <path id="riverFlow" class="flowline" d="M700 310 Q705 250 700 207" pointer-events="none" opacity="0"/>
+     <!-- spring -->
+     <path id="springFlow" class="flowline" d="M246 340 Q252 250 246 154 Q232 150 222 168" pointer-events="none" opacity="0"/>
+     <g class="hot" data-info="spring" tabindex="0" role="button" aria-label="Spring: show information"><circle cx="246" cy="150" r="16" fill="#3a8fd0" stroke="#fff" stroke-width="3"/><text x="246" y="156" text-anchor="middle" font-size="16">💦</text></g>
+     <text x="150" y="108" font-size="14" font-weight="700" fill="#fff" stroke="#2a4a2a" stroke-width=".6" pointer-events="none">Spring ▸</text>
+     <!-- well -->
+     <rect x="522" y="170" width="26" height="230" fill="#2b2b32" pointer-events="none"/>
+     <rect id="wellWater" x="526" y="300" width="18" height="95" fill="#4aa6ee" pointer-events="none"/>
+     <g class="hot" data-info="well" tabindex="0" role="button" aria-label="Well: show information">
+      <rect x="512" y="140" width="46" height="30" rx="3" fill="#9a9aa5"/><path d="M505 142 L535 118 L565 142 Z" fill="#a33b2e"/><text x="535" y="165" text-anchor="middle" font-size="14">🪣</text>
+     </g>
+     <text x="535" y="108" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" stroke="#2a4a2a" stroke-width=".6" pointer-events="none">Well</text>
+     <!-- water table (moves with level) -->
+     <g id="wtGroup" pointer-events="none">
+      <line x1="0" x2="800" y1="0" y2="0" stroke="#fff" stroke-width="3" stroke-dasharray="14 7"/>
+      <rect x="318" y="-14" width="120" height="24" rx="12" fill="#10303a"/>
+      <text x="378" y="3" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">Water Table</text>
+     </g>
+     <!-- layer labels -->
+     <g font-size="13" font-weight="700" fill="#fff" stroke="#000" stroke-opacity=".35" stroke-width=".4" pointer-events="none">
+      <text x="590" y="212">Topsoil</text><text x="590" y="270" fill="#3a2a10" stroke="none">Sand &amp; Gravel</text>
+      <text x="590" y="385">Aquifer</text><text x="590" y="445">Impermeable Rock</text>
+     </g>
+     <!-- rain + followed drop -->
+     <g id="drops" pointer-events="none"></g>
+     <g id="follow" pointer-events="none" style="display:none"><circle r="16" fill="#fff" opacity=".5"><animate attributeName="r" values="10;20;10" dur="1.2s" repeatCount="indefinite"/></circle><circle r="8" fill="#0a5fb0" stroke="#fff" stroke-width="2"/></g>
+    </svg>
+   </div>
+
+   <div class="panels">
+    <div class="card">
+     <h3>Controls</h3>
+     <label class="ctl" for="rain">Rainfall <span class="val" id="rainV">Medium</span></label>
+     <input type="range" id="rain" min="0" max="100" value="50"><div class="ends"><span>Low</span><span>Medium</span><span>High</span></div>
+     <label class="ctl" for="use" style="margin-top:14px">Groundwater Usage <span class="val" id="useV">Medium</span></label>
+     <input type="range" id="use" min="0" max="100" value="40"><div class="ends"><span>Low</span><span>Medium</span><span>High</span></div>
+     <div class="row"><button class="btn" id="dropBtn">Follow One Drop 💧</button><button class="btn ghost" id="resetBtn">Reset</button></div>
+    </div>
+    <div class="card" aria-live="polite">
+     <h3>Live Status</h3>
+     <div class="stat"><span>Groundwater Level</span><b id="lvl">62%</b></div>
+     <div class="bar" role="progressbar" aria-label="Groundwater level" aria-valuemin="0" aria-valuemax="100" id="lvlBar"><i></i></div>
+     <div class="stat"><span>Recharge</span><b id="sRech">Medium</b></div>
+     <div class="stat"><span>Usage</span><b id="sUse">Medium</b></div>
+     <div class="stat"><span>Status</span><b class="pill" id="sStat">Healthy</b></div>
+     <div class="warn" id="warn" role="alert">⚠ Groundwater is critically low! Reduce usage or wait for rain so the aquifer can recover.</div>
+    </div>
+    <div class="card" id="info" tabindex="-1">
+     <h3>Explore the underground</h3>
+     <p>Click the <b>well</b>, the <b>spring</b> or any <b>ground layer</b> in the picture to see how water behaves there.</p>
+    </div>
+    <div class="card" id="dropPanel" aria-live="polite">
+     <h3 id="dropT"></h3><p id="dropX"></p><div class="steps" id="dropSteps" aria-hidden="true"></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- Groundwater Cycle -->
+<section id="cycle" aria-labelledby="cycH" style="background:var(--soft)">
+ <div class="wrap">
+  <h2 id="cycH">The Groundwater Cycle</h2>
+  <p class="lead">Water never stops moving. Select a stage, or press play to follow the loop.</p>
+  <div class="chips" id="chips" role="group" aria-label="Groundwater cycle stages"></div>
+  <div class="card" id="cycCard" aria-live="polite"></div>
+  <button class="btn" id="cycPlay" style="margin-top:14px">▶ Play the cycle</button>
+
+  <h2 style="margin-top:56px">Real-Life Examples</h2>
+  <div class="grid ex-grid">
+   <article class="card"><div class="ex">🪣</div><h3>Wells</h3><p>A well is a hole drilled or dug below the water table. Groundwater seeps into it from surrounding pores and cracks, and a pump or bucket lifts it up.</p></article>
+   <article class="card"><div class="ex">⛲</div><h3>Springs</h3><p>Where the water table meets the land surface, such as on a hillside, groundwater flows out naturally as a spring.</p></article>
+   <article class="card"><div class="ex">🏞️</div><h3>Rivers</h3><p>Groundwater seeps into river beds and keeps rivers flowing during dry weeks. This steady supply is called base flow.</p></article>
+   <article class="card"><div class="ex">🌾</div><h3>Agriculture</h3><p>Farmers pump groundwater to irrigate crops when rain is unreliable, which makes it a major user of the resource.</p></article>
+   <article class="card"><div class="ex">🚰</div><h3>Drinking Water</h3><p>Groundwater is filtered naturally as it moves through soil and rock, so it is a key freshwater source for billions of people.</p></article>
+  </div>
+ </div>
+</section>
+
+<!-- Problems -->
+<section id="problems" aria-labelledby="probH">
+ <div class="wrap">
+  <h2 id="probH">What Happens When We Use Too Much Groundwater?</h2>
+  <p class="lead">Compare two aquifers. Press the button to see 20 years of overuse.</p>
+  <div class="cmp">
+   <div class="card good"><h3>Healthy Aquifer</h3>
+    <div class="tank" aria-hidden="true"><span class="tag">Water table</span><div class="fill" style="height:85%"></div></div>
+    <ul class="tight"><li>High groundwater</li><li>Healthy water table</li><li>Good recharge</li></ul></div>
+   <div class="card bad"><h3>Overused Aquifer <small id="yrs"></small></h3>
+    <div class="tank" aria-hidden="true"><span class="tag">Water table</span><div class="fill" id="badFill" style="height:85%"></div></div>
+    <ul class="tight" id="badList"><li>High groundwater</li><li>Healthy water table</li><li>Good recharge</li></ul></div>
+  </div>
+  <div class="row"><button class="btn" id="overBtn">Simulate 20 years of overuse</button><button class="btn ghost" id="overReset">Reset</button></div>
+ </div>
+</section>
+
+<!-- Solutions -->
+<section id="solutions" aria-labelledby="solH" style="background:var(--soft)">
+ <div class="wrap">
+  <h2 id="solH">How Can We Protect Groundwater?</h2>
+  <p class="lead">Select a card to read more.</p>
+  <div class="grid" id="solGrid"></div>
+</div>
+</section>
+
+<!-- Quiz -->
+<section id="quiz" aria-labelledby="quizH">
+ <div class="wrap" style="max-width:780px">
+  <h2 id="quizH">Mini Quiz</h2>
+  <p class="lead" id="quizProg">Answer all 5 questions, then press Submit.</p>
+  <form id="quizForm" class="card" onsubmit="return false"></form>
+  <div class="row"><button class="btn" id="qSubmit">Submit answers</button><button class="btn ghost" id="qRestart">Restart quiz</button></div>
+  <div id="result" role="status" style="margin-top:18px"></div>
+ </div>
+</section>
+
+<!-- Quick Facts -->
+<section aria-labelledby="factH" style="background:var(--soft)">
+ <div class="wrap">
+  <h2 id="factH">Quick Facts</h2>
+  <div class="grid">
+   <div class="card fact"><span class="ex">🌍</span>Groundwater is stored beneath the Earth's surface.</div>
+   <div class="card fact"><span class="ex">⏳</span>Aquifers can contain water for long periods.</div>
+   <div class="card fact"><span class="ex">🌧️</span>Rainfall is an important source of groundwater recharge.</div>
+   <div class="card fact"><span class="ex">⚙️</span>Excessive pumping can lower the water table.</div>
+   <div class="card fact"><span class="ex">🏠</span>Rainwater harvesting can help recharge groundwater.</div>
+  </div>
+ </div>
+</section>
+</main>
+<footer><div class="wrap">College project · From Rain to Groundwater: Understanding Our Underground Water</div></footer>
+
+<!-- ==================== 3. JAVASCRIPT ==================== -->
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const NS="http://www.w3.org/2000/svg", clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- Theme (saved in localStorage) ---------- */
+const root=document.documentElement, themeBtn=$("#themeBtn");
+function setTheme(t){root.dataset.theme=t;themeBtn.textContent=t==="dark"?"☀ Light":"🌙 Dark";
+ themeBtn.setAttribute("aria-label",t==="dark"?"Switch to light mode":"Switch to dark mode");
+ try{localStorage.setItem("theme",t)}catch(e){}}
+let saved=null;try{saved=localStorage.getItem("theme")}catch(e){}
+setTheme(saved||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+themeBtn.onclick=()=>setTheme(root.dataset.theme==="dark"?"light":"dark");
+
+/* ---------- Mobile menu + scroll progress ---------- */
+const links=$("#links"),menuBtn=$("#menuBtn");
+menuBtn.onclick=()=>{const o=links.classList.toggle("open");menuBtn.setAttribute("aria-expanded",o);menuBtn.textContent=o?"✕":"☰"};
+links.addEventListener("click",e=>{if(e.target.tagName==="A"){links.classList.remove("open");menuBtn.setAttribute("aria-expanded","false");menuBtn.textContent="☰"}});
+addEventListener("scroll",()=>{const h=root.scrollHeight-innerHeight;$("#progress").style.width=(h>0?scrollY/h*100:0)+"%"},{passive:true});
+
+/* ---------- Hero flow ---------- */
+$$(".node").forEach(n=>n.onclick=()=>{$$(".node").forEach(x=>x.classList.remove("on"));n.classList.add("on");$("#heroCap").textContent=n.dataset.cap});
+
+/* ---------- Simulator state ---------- */
+const S={rain:50,use:40,level:62}, band=v=>v<34?"Low":v<67?"Medium":"High";
+const gw=$("#gwRect"),wt=$("#wtGroup"),wellW=$("#wellWater"),sFlow=$("#springFlow"),rFlow=$("#riverFlow");
+let springBoost=0;
+function statusOf(l){return l>=60?["Healthy","var(--ok)"]:l>=35?["Moderate","var(--acc)"]:l>=15?["Low","var(--warn)"]:["Critical","var(--warn)"]}
+function render(){
+ const y=400-S.level*1.6;                       // 0% -> y400 (bottom), 100% -> y240
+ gw.setAttribute("y",y);gw.setAttribute("height",400-y);
+ wt.setAttribute("transform","translate(0,"+y+")");
+ wellW.setAttribute("y",y);wellW.setAttribute("height",Math.max(0,395-y));
+ const sp=clamp((S.level-30)/40,0,1);
+ sFlow.style.opacity=Date.now()<springBoost?1:sp*.9;
+ rFlow.style.opacity=clamp((S.level-40)/40,0,1)*.8;
+ const L=Math.round(S.level),st=statusOf(S.level);
+ $("#lvl").textContent=L+"%";$("#lvlBar").setAttribute("aria-valuenow",L);$("#lvlBar i").style.width=L+"%";
+ $("#sRech").textContent=band(S.rain);$("#sUse").textContent=band(S.use);
+ const p=$("#sStat");p.textContent=st[0];p.style.color=st[1];
+ $("#warn").classList.toggle("show",S.level<15);
+}
+$("#rain").oninput=e=>{S.rain=+e.target.value;$("#rainV").textContent=band(S.rain)};
+$("#use").oninput=e=>{S.use=+e.target.value;$("#useV").textContent=band(S.use)};
+$("#resetBtn").onclick=()=>{S.rain=50;S.use=40;S.level=62;$("#rain").value=50;$("#use").value=40;$("#rainV").textContent=$("#useV").textContent="Medium";$("#useV").textContent="Medium"};
+
+/* Rain / infiltration droplets: fall fast, then slow down underground until they reach the water table */
+const drops=[],dg=$("#drops");let last=performance.now();
+function loop(now){
+ const dt=Math.min((now-last)/1000,.1);last=now;
+ S.level=clamp(S.level+dt*(S.rain*.02-S.use*.017),0,100);  // recharge minus extraction
+ if(S.rain>0&&drops.length<90&&Math.random()<S.rain/100*.55){
+  const c=document.createElementNS(NS,"circle");c.setAttribute("r",3);c.setAttribute("fill","#e8f6ff");
+  dg.appendChild(c);drops.push({c,x:10+Math.random()*780,y:92+Math.random()*10,ph:0});
+ }
+ const wy=400-S.level*1.6;
+ for(let i=drops.length-1;i>=0;i--){
+  const d=drops[i];d.y+=d.ph?1.6:6;
+  if(!d.ph&&d.y>=170){d.ph=1;d.c.setAttribute("fill","#2f86d6");d.c.setAttribute("stroke","#fff");d.c.setAttribute("stroke-width","1")}
+  if(d.y>=wy||d.y>=398){d.c.remove();drops.splice(i,1);continue}
+  d.c.setAttribute("cx",d.x);d.c.setAttribute("cy",d.y);
+ }
+ render();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ---------- Clickable layers, well, spring ---------- */
+const INFO={
+ topsoil:{t:"Topsoil",a:"Yes, slowly",w:"The dark, living top layer made of organic matter and minerals.",h:"Water soaks in between soil particles. Roots and worms create channels that speed this up.",y:"It is the first filter. Healthy topsoil lets rain enter instead of running off."},
+ sand:{t:"Sand & Gravel",a:"Yes, quickly",w:"A loose layer of coarse grains with large gaps between them.",h:"Water drains through easily and moves downward by gravity (percolation).",y:"It acts as a fast pathway that carries water down to the aquifer."},
+ aquifer:{t:"Aquifer",a:"Yes, and it stores water",w:"Porous rock or sediment, such as sandstone, whose pores and cracks are filled with water.",h:"Water fills the spaces and flows slowly sideways toward lower ground, wells, springs and rivers.",y:"It is the underground reservoir that supplies wells and keeps springs and rivers flowing."},
+ rock:{t:"Impermeable Rock",a:"No, it blocks water",w:"Dense rock such as clay or granite with almost no connected gaps.",h:"Water cannot pass through, so it collects on top of this layer.",y:"It forms the floor of the aquifer and stops water draining away deeper."},
+ well:()=>({t:"How does a well get water?",x:"A well reaches down into groundwater stored in underground pores and cracks. Water seeps in from the rock around the shaft and is lifted to the surface.",s:S.level>=50?"✅ Water is easily available.":S.level>=15?"⚠ The water level is getting deeper. Pumps must work harder.":"🚨 The water level is very deep. The well may run dry."}),
+ spring:()=>({t:"What is a spring?",x:"A spring occurs when groundwater naturally reaches the Earth's surface, usually where the water table meets a hillside. Watch the flow rise from the aquifer.",s:S.level>=35?"Water is flowing strongly from the aquifer.":"Groundwater is low, so the spring flow is weak."})
+};
+function showInfo(k){
+ const d=typeof INFO[k]==="function"?INFO[k]():INFO[k],el=$("#info");
+ el.innerHTML="<h3>"+d.t+"</h3>"+(d.x?"<p>"+d.x+"</p><p><b>"+d.s+"</b></p>":
+  "<dl><dt>What is it?</dt><dd>"+d.w+"</dd><dt>How does water behave?</dt><dd>"+d.h+"</dd><dt>Does water pass through?</dt><dd>"+d.a+"</dd><dt>Why it matters</dt><dd>"+d.y+"</dd></dl>");
+ $$(".layer").forEach(l=>l.classList.toggle("sel",l.dataset.info===k));
+ if(k==="spring")springBoost=Date.now()+5000;
+ el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");
+ if(innerWidth<900)el.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+$$("[data-info]").forEach(g=>{g.addEventListener("click",()=>showInfo(g.dataset.info));
+ g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showInfo(g.dataset.info)}})});
+
+/* ---------- Follow One Drop ---------- */
+const STAGES=[
+ ["Stage 1 – Cloud","Water vapour condenses into droplets inside a cloud.",150,55],
+ ["Stage 2 – Rainfall","Rain falls onto the Earth's surface.",150,165],
+ ["Stage 3 – Ground surface","Part of the rain is not lost as runoff. It reaches the ground.",150,200],
+ ["Stage 4 – Infiltration","Some water enters the soil through tiny gaps.",150,265],
+ ["Stage 5 – Percolation","Gravity pulls the water down through sand and gravel.",150,335],
+ ["Stage 6 – Recharge","The drop reaches the aquifer and replenishes the groundwater.",200,355],
+ ["Stage 7 – Groundwater flow","Groundwater creeps sideways and upward through pores and cracks.",246,300],
+ ["Stage 8 – Discharge","The water reaches the surface at a spring. It could also feed a well or a river!",246,160]
+];
+let running=false;const fol=$("#follow"),dp=$("#dropPanel"),steps=$("#dropSteps");
+steps.innerHTML=STAGES.map(()=>"<b></b>").join("");
+$("#dropBtn").onclick=function(){
+ if(running)return;running=true;this.disabled=true;dp.classList.add("show");fol.style.display="";
+ $("#simulator .scene").scrollIntoView({behavior:"smooth",block:"center"});
+ const T=2600,t0=performance.now();let shown=-1;
+ (function step(now){
+  const e=now-t0,i=Math.min(Math.floor(e/T),STAGES.length-1),f=i===STAGES.length-1?0:(e-i*T)/T*1.0;
+  const a=STAGES[i],b=STAGES[Math.min(i+1,STAGES.length-1)],k=clamp(f*1.4,0,1);
+  fol.setAttribute("transform","translate("+(a[2]+(b[2]-a[2])*k)+","+(a[3]+(b[3]-a[3])*k)+")");
+  if(i!==shown){shown=i;$("#dropT").textContent=a[0];$("#dropX").textContent=a[1];[...steps.children].forEach((s,j)=>s.classList.toggle("done",j<=i));springBoost=i===7?Date.now()+4000:springBoost}
+  if(e<T*STAGES.length)requestAnimationFrame(step);
+  else{running=false;$("#dropBtn").disabled=false;$("#dropBtn").textContent="Follow Another Drop 💧";setTimeout(()=>{if(!running)fol.style.display="none"},1500)}
+ })(t0);
+};
+
+/* ---------- Groundwater cycle ---------- */
+const CYC=[
+ ["Rainfall","Water falls from clouds as rain, snow or hail and lands on the surface."],
+ ["Infiltration","Some of the water soaks into the ground through the soil surface."],
+ ["Percolation","Gravity pulls the water down through soil and sand until it meets saturated rock."],
+ ["Groundwater Storage","Water fills pores and cracks in an aquifer and can stay for years or centuries."],
+ ["Groundwater Flow","Water moves slowly sideways, from high ground toward low ground."],
+ ["Discharge","Groundwater leaves the aquifer through springs, wells and seepage into rivers and lakes."],
+ ["Evaporation","The Sun warms surface water and plants release vapour, which rises to form clouds and rain again."]
+];
+const chips=$("#chips");let cyc=0,cTimer=null;
+chips.innerHTML=CYC.map((c,i)=>'<button class="chip" data-i="'+i+'" aria-pressed="false">'+c[0]+'</button>'+(i<6?'<span aria-hidden="true">→</span>':'<span aria-hidden="true">↻</span>')).join("");
+function setCyc(i){cyc=i;$$(".chip").forEach(c=>{const on=+c.dataset.i===i;c.classList.toggle("on",on);c.setAttribute("aria-pressed",on)});
+ $("#cycCard").innerHTML="<h3>"+CYC[i][0]+"</h3><p style='margin:0'>"+CYC[i][1]+"</p>"}
+chips.addEventListener("click",e=>{const b=e.target.closest(".chip");if(b){stopCyc();setCyc(+b.dataset.i)}});
+function stopCyc(){clearInterval(cTimer);cTimer=null;$("#cycPlay").textContent="▶ Play the cycle"}
+$("#cycPlay").onclick=()=>{if(cTimer)return stopCyc();$("#cycPlay").textContent="⏸ Pause";setCyc(0);
+ cTimer=setInterval(()=>setCyc((cyc+1)%CYC.length),2600)};
+setCyc(0);
+
+/* ---------- Problem comparison ---------- */
+const bad=$("#badFill");let overT=null;
+function setBad(p,yr){bad.style.height=p+"%";$("#yrs").textContent=yr?"(year "+yr+")":"";
+ $("#badList").innerHTML=p>60?"<li>High groundwater</li><li>Healthy water table</li><li>Good recharge</li>":
+ "<li>Low groundwater</li><li>Falling water table</li><li>Reduced availability</li>"+(p<35?"<li>Possible land sinking and dry wells</li><li>Rivers and springs shrink</li>":"")}
+$("#overBtn").onclick=function(){cancelAnimationFrame(overT);const t0=performance.now(),D=6000;
+ (function s(n){const f=clamp((n-t0)/D,0,1);setBad(Math.round(85-67*f),Math.round(f*20));if(f<1)overT=requestAnimationFrame(s)})(t0)};
+$("#overReset").onclick=()=>{cancelAnimationFrame(overT);setBad(85,0)};
+
+/* ---------- Solutions ---------- */
+const SOL=[["🏠 Rainwater harvesting","Collect rain from roofs in tanks or direct it into the ground instead of letting it run into drains."],
+["🕳️ Recharge pits","Pits filled with gravel and sand let surface water seep down into the aquifer."],
+["🔧 Recharge wells","Filtered rainwater is guided down a well so it reaches deeper aquifers directly."],
+["🚿 Reduce unnecessary use","Fix leaks, use drip irrigation and switch off taps. Less pumping means a higher water table."],
+["🏞️ Protect lakes and ponds","Water standing in lakes and ponds slowly soaks into the ground and recharges nearby aquifers."],
+["🌳 Plant vegetation","Roots open the soil, and plant cover slows runoff so more rain can soak in."],
+["🛡️ Prevent pollution","Keep chemicals, fuel and waste away from soil and wells. Polluted groundwater is very hard to clean."]];
+$("#solGrid").innerHTML=SOL.map(s=>'<button class="card sol" aria-expanded="false"><h3>'+s[0]+'<b aria-hidden="true">+</b></h3><div class="more"><div>'+s[1]+'</div></div></button>').join("");
+$("#solGrid").addEventListener("click",e=>{const b=e.target.closest(".sol");if(b)b.setAttribute("aria-expanded",b.getAttribute("aria-expanded")!=="true")});
+
+/* ---------- Quiz ---------- */
+const QZ=[
+ ["What is an aquifer?",["A layer of rock or sediment that stores and carries groundwater","A type of cloud","A pipe that carries tap water","A layer of dry bedrock"],0,"An aquifer is porous or cracked underground material that holds usable water."],
+ ["What is groundwater recharge?",["Water evaporating from a lake","Water moving down to refill an aquifer","Pumping water out of a well","Melting of clouds"],1,"Recharge is the process where infiltrating water replenishes groundwater."],
+ ["What happens when groundwater usage is too high?",["The water table rises","Nothing changes","The water table falls and wells may dry up","Rainfall increases"],2,"Pumping faster than recharge lowers the water table."],
+ ["What is a water table?",["The top surface of the saturated zone underground","A kitchen table","The bottom of a river","A map of rainfall"],0,"Below the water table, soil and rock pores are completely filled with water."],
+ ["How does rainwater enter the ground?",["Through infiltration into soil","Only through rivers","By evaporation","It cannot enter the ground"],0,"Rain soaks in through gaps in the soil, then percolates downward."]];
+const qf=$("#quizForm");
+function buildQuiz(){
+ qf.classList.remove("checked");$("#result").style.display="none";
+ qf.innerHTML=QZ.map((q,i)=>'<fieldset class="q" style="border:0;padding:0;margin:0 0 22px"><legend>'+(i+1)+". "+q[0]+'</legend>'+
+  q[1].map((o,j)=>'<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>').join("")+
+  '<div class="expl"></div></fieldset>').join("");
+ $("#qSubmit").disabled=false;prog();
+}
+function prog(){const n=QZ.filter((q,i)=>qf.querySelector('input[name=q'+i+']:checked')).length;$("#quizProg").textContent=n+" of "+QZ.length+" answered"}
+qf.addEventListener("change",prog);
+$("#qSubmit").onclick=()=>{
+ let score=0;const open=[];
+ QZ.forEach((q,i)=>{const c=qf.querySelector('input[name=q'+i+']:checked');if(!c)open.push(i+1)});
+ const r=$("#result");
+ if(open.length){r.style.display="block";r.textContent="Please answer question"+(open.length>1?"s ":" ")+open.join(", ")+" first.";return}
+ QZ.forEach((q,i)=>{const fs=qf.children[i],opts=fs.querySelectorAll(".opt"),pick=+qf.querySelector('input[name=q'+i+']:checked').value;
+  opts[q[2]].classList.add("right");if(pick!==q[2])opts[pick].classList.add("wrong");else score++;
+  fs.querySelector(".expl").textContent=(pick===q[2]?"✅ Correct. ":"❌ Correct answer: "+q[1][q[2]]+". ")+q[3]});
+ qf.classList.add("checked");qf.querySelectorAll("input").forEach(x=>x.disabled=true);$("#qSubmit").disabled=true;
+ r.style.display="block";r.textContent="Your score: "+score+" / "+QZ.length+(score===QZ.length?" 🎉 Perfect!":score>=3?" 👍 Well done!":" Keep learning!");
+ r.style.animation="none";void r.offsetWidth;r.style.animation="";
+};
+$("#qRestart").onclick=()=>{buildQuiz();$("#quiz").scrollIntoView({behavior:"smooth"})};
+buildQuiz();
+
+/* ---------- Fact cards reveal on scroll ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.2});
+$$(".fact").forEach((f,i)=>{f.style.transitionDelay=i*90+"ms";io.observe(f)});
+})();
+</script>
+</body>
+</html>
